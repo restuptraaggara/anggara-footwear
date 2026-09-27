@@ -1,0 +1,42 @@
+.hold-button-container {
+  position: relative;
+  width: 100%;
+  display: inline-block;
+}
+.hold-button {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.875rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: white;
+  background-color: #111827;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, background-color 0.2s ease;
+}
+.hold-button.danger {
+  background-color: #991b1b;
+}
+.hold-button:active {
+  transform: scale(0.98);
+}
+.hold-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.25);
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+.hold-button.danger .hold-progress-fill {
+  background: rgba(255, 255, 255, 0.35);
+}

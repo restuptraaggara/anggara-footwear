@@ -168,6 +168,29 @@
                         Simpan Status Baru
                     </button>
                 </form>
+                    {{-- Form Pembatalan Cepat dengan HoldButton --}}
+                    @if($order->status !== 'cancelled')
+                    <div class="pt-4 border-t border-earth-100">
+                        <form id="cancel-order-form" action="{{ route('admin.orders.status.update', $order->id) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="cancelled">
+                            
+                            <p class="text-[11px] text-gray-500 font-light mb-2">
+                                Pembatalan otomatis mengembalikan stok produk yang dipesan ke gudang.
+                            </p>
+
+                            <div class="react-hold-button"
+                                 data-label="Tahan untuk Batalkan Order"
+                                 data-completed-label="✓ Membatalkan Pesanan..."
+                                 data-variant="danger"
+                                 data-form-id="cancel-order-form"
+                                 data-hold-time="1500">
+                            </div>
+                        </form>
+                    </div>
+                    @endif
+
             </div>
 
             {{-- Payment Summary Box --}}

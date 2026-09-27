@@ -1,0 +1,43 @@
+.accordion-gallery-container {
+  display: flex;
+  width: 100%;
+  height: 480px;
+  gap: 1rem;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 0.5rem;
+}
+.accordion-slide {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.3s ease;
+}
+.accordion-slide.active {
+  flex: 3.5;
+}
+.accordion-slide:not(.active):hover {
+  flex: 1.4;
+}
+.accordion-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
+}
+.accordion-slide.active img {
+  transform: scale(1.04);
+}
+.accordion-slide-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 2rem;
+  transition: opacity 0.4s ease;
+}

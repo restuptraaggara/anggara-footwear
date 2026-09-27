@@ -7,7 +7,7 @@
     <title>@yield('title', 'Allbirds Store — Naturally Comfortable')</title>
 
     {{-- Vite compiled CSS --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.jsxx'])
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
