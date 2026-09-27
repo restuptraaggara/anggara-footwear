@@ -9,7 +9,8 @@ use App\Http\Controllers\CheckoutController;
 // Home
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Products
+// Products + Live Search API
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
@@ -26,3 +27,6 @@ Route::prefix('cart')->name('cart.')->group(function () {
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+// Wishlist (client-side LocalStorage, this route just serves the view)
+Route::view('/wishlist', 'wishlist')->name('wishlist');

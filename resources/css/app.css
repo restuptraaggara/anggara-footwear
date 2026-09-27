@@ -5,9 +5,8 @@
 
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    
-    /* Earthy color palette */
-    --color-earth-50: #FAF8F5;
+
+    --color-earth-50:  #FAF8F5;
     --color-earth-100: #F5F0E8;
     --color-earth-200: #EDE4D3;
     --color-earth-300: #DDD0B8;
@@ -17,8 +16,8 @@
     --color-earth-700: #806A49;
     --color-earth-800: #65523A;
     --color-earth-900: #4A3D2C;
-    
-    --color-forest-50: #F2F7F2;
+
+    --color-forest-50:  #F2F7F2;
     --color-forest-100: #E0EDE0;
     --color-forest-200: #C2DAC2;
     --color-forest-300: #9BC49B;
@@ -34,40 +33,167 @@
         background-color: #FAFAF8;
         color: #2C2C2C;
         -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
-    
     [x-cloak] { display: none !important; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #FAF8F5; }
+    ::-webkit-scrollbar-thumb { background: #C9B99A; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #9E8560; }
 }
 
 @layer components {
-    .color-swatch {
-        @apply w-6 h-6 rounded-full cursor-pointer transition-all border-2 border-transparent;
-    }
-    .color-swatch:hover,
-    .color-swatch.active {
-        @apply border-gray-900 scale-110;
-    }
-    
+    /* Product card */
     .product-card {
-        @apply transition-transform duration-300;
+        transition: transform 0.3s cubic-bezier(.25,.8,.25,1), box-shadow 0.3s ease;
     }
     .product-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0,0,0,.10);
     }
-    
+
+    /* Color swatches (catalog) */
+    .swatch-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease;
+        border: 2px solid transparent;
+        box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.12);
+    }
+    .swatch-dot:hover { transform: scale(1.25); }
+    .swatch-dot.active {
+        border-color: #111;
+        transform: scale(1.2);
+        box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111;
+    }
+
+    /* Detail page swatch */
+    .detail-swatch {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: transform 0.2s cubic-bezier(.34,1.56,.64,1), box-shadow 0.2s ease;
+        box-shadow: inset 0 0 0 1.5px rgba(0,0,0,.15);
+    }
+    .detail-swatch:hover { transform: scale(1.15); }
+    .detail-swatch.active {
+        border-color: #111;
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111;
+        transform: scale(1.15);
+    }
+
+    /* Primary button */
     .btn-primary {
-        @apply bg-gray-900 text-white px-8 py-4 text-xs tracking-widest uppercase font-medium 
+        @apply bg-gray-900 text-white px-8 py-4 text-xs tracking-widest uppercase font-medium
                hover:bg-earth-800 transition-all duration-200 inline-block text-center;
     }
-    
     .btn-outline {
-        @apply border border-gray-300 text-gray-700 px-8 py-4 text-xs tracking-widest uppercase font-medium 
+        @apply border border-gray-300 text-gray-700 px-8 py-4 text-xs tracking-widest uppercase font-medium
                hover:border-gray-900 hover:text-gray-900 transition-all duration-200 inline-block text-center;
+    }
+
+    /* Filter pill */
+    .filter-pill {
+        transition: all 0.18s ease;
+    }
+    .filter-pill.active {
+        background: #111;
+        color: #fff;
+        border-color: #111;
+    }
+
+    /* Size button */
+    .size-btn {
+        transition: all 0.18s cubic-bezier(.25,.8,.25,1);
+    }
+    .size-btn:not(:disabled):hover { transform: scale(1.05); }
+    .size-btn.selected { transform: scale(1.05); }
+
+    /* Stock indicator */
+    .stock-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .stock-dot.in-stock  { background: #4A8F4A; }
+    .stock-dot.low-stock { background: #F59E0B; }
+    .stock-dot.out-stock { background: #EF4444; }
+
+    /* Skeleton shimmer */
+    .skeleton {
+        background: linear-gradient(90deg, #f0ede8 25%, #e8e2d9 50%, #f0ede8 75%);
+        background-size: 800px 100%;
+        animation: shimmer 1.4s infinite;
+        border-radius: 8px;
+    }
+
+    /* Announcement bar */
+    .announcement-bar {
+        background: #1f1f1f;
     }
 }
 
 @layer utilities {
-    .scrollbar-thin::-webkit-scrollbar { width: 4px; }
-    .scrollbar-thin::-webkit-scrollbar-track { background: #FAF8F5; }
-    .scrollbar-thin::-webkit-scrollbar-thumb { background: #C9B99A; border-radius: 2px; }
+    /* Main product image cross-fade */
+    .main-product-img {
+        transition: opacity 0.25s ease;
+    }
+    .main-product-img.fading {
+        opacity: 0;
+    }
+
+    /* Fade slide in for wishlist cards */
+    .fade-in {
+        animation: fadeSlideIn 0.35s ease both;
+    }
+}
+
+/* Keyframes */
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+}
+
+@keyframes heartPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); }
+    70%  { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+@keyframes heartBeat {
+    0%   { transform: scale(1); }
+    25%  { transform: scale(1.3); }
+    50%  { transform: scale(1); }
+    75%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes btnPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .7; }
+}
+
+.heart-pop  { animation: heartPop  0.35s ease forwards; }
+.heart-beat { animation: heartBeat 0.45s ease forwards; }
+.btn-loading { animation: btnPulse 0.9s ease-in-out infinite; }
+.badge-sold-out {
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
 }
