@@ -8,15 +8,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     protected $fillable = [
-        'order_number', 'customer_name', 'customer_email', 'customer_phone',
-        'shipping_address', 'city', 'postal_code', 'subtotal', 
-        'shipping_cost', 'total', 'payment_method', 'status', 'notes'
+        'order_number',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
+        'shipping_address',
+        'city',
+        'postal_code',
+        'subtotal',
+        'shipping_cost',
+        'total',
+        'payment_method',
+        'snap_token',
+        'payment_type',
+        'payment_status',
+        'paid_at',
+        'status',
+        'notes',
     ];
 
     protected $casts = [
-        'subtotal' => 'decimal:2',
-        'shipping_cost' => 'decimal:2',
-        'total' => 'decimal:2',
+        'subtotal'       => 'decimal:2',
+        'shipping_cost'  => 'decimal:2',
+        'total'          => 'decimal:2',
+        'paid_at'        => 'datetime',
     ];
 
     public function items(): HasMany

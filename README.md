@@ -14,6 +14,17 @@
 ## ✨ Fitur Utama
 
 
+
+### 💳 Update Stage 3: Integrasi Midtrans Snap & Transaksi Realistis
+- 🌐 **Konfigurasi Midtrans Snap**: Konfigurasi lengkap di `config/midtrans.php` dan `.env` (Server Key, Client Key, Production/Sandbox flag).
+- ⚡ **Smart Mockup Snap Simulator**: Fallback cerdas interaktif popup (QRIS & VA Bank) jika akun Sandbox belum diisi, memungkinkan pengujian alur pembayaran dan webhook tanpa hambatan.
+- 🔄 **AJAX Snap Token & Callback**: Generate Snap Token via backend AJAX tanpa reload halaman, menangani status `onSuccess`, `onPending`, `onError`, `onClose`.
+- 📦 **Automated Inventory & Stock Deduction**:
+  - Validasi stok sebelum checkout: mencegah pembelian jika stok varian yang dipilih sudah 0.
+  - Saat pembayaran terverifikasi settlement/lunas via webhook/simulator, kuantitas stok varian otomatis berkurang di database secara atomik (`DB::transaction`).
+- 🔔 **Webhook Notification Handler**: Rute `POST /api/midtrans/notification` untuk menangani status transaksi settlement, capture, pending, expire, dan cancel.
+- 🖨️ **Halaman Order Status & Cetak Invoice**: Halaman konfirmasi pesanan interaktif dengan status pembayaran real-time dan halaman cetak/unduh invoice print-ready (`/orders/invoice/{orderNumber}`).
+
 ### 🔐 Update Stage 2: Admin Panel & Manajemen Stok
 - 🛡️ **Autentikasi Admin Terproteksi**: Rute `/admin` dengan middleware `AdminMiddleware`, akun default `admin@allbirds.test` / `password123`, login page minimalis, dan tombol switch ke public store.
 - 📊 **Dashboard Overview**: Kartu metrik real-time (Total Pendapatan dari order lunas, Total Pesanan, Total Produk Aktif, Peringatan Varian Stok Menipis <5) dan tabel 5 pesanan terbaru.

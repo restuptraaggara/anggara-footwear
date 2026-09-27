@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -32,10 +33,15 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/count', [CartController::class, 'count'])->name('count');
 });
 
-// Checkout
+// Checkout & Midtrans Snap Flow
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/process', [PaymentController::class, 'processCheckout'])->name('checkout.process');
+Route::post('/checkout/simulate-payment', [PaymentController::class, 'simulatePayment'])->name('checkout.simulate');
 Route::get('/checkout/success/{orderNumber}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/orders/invoice/{orderNumber}', [PaymentController::class, 'invoice'])->name('orders.invoice');
+
+// Webhook Notification Endpoint (Midtrans / Simulator)
+Route::post('/api/midtrans/notification', [PaymentController::class, 'handleNotification'])->name('midtrans.notification');
 
 // Wishlist
 Route::view('/wishlist', 'wishlist')->name('wishlist');
@@ -61,7 +67,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Product Management (CRUD)
         Route::resource('products', AdminProductController::class);
         
-        // Variant Management (Nested inside product or direct update)
+        // Variant Management
         Route::post('/products/{product}/variants', [AdminProductVariantController::class, 'store'])->name('products.variants.store');
         Route::put('/variants/{variant}', [AdminProductVariantController::class, 'update'])->name('variants.update');
         Route::delete('/variants/{variant}', [AdminProductVariantController::class, 'destroy'])->name('variants.destroy');

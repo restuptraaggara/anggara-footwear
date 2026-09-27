@@ -1,95 +1,117 @@
 @extends('layouts.app')
 
-@section('title', 'Pesanan Berhasil — Allbirds Store')
+@section('title', 'Status Pesanan ' . $order->order_number . ' — Allbirds Store')
 
 @section('content')
-<div class="max-w-2xl mx-auto px-6 py-20 text-center">
+<div class="max-w-3xl mx-auto px-6 py-16">
 
-    <div class="mb-8">
-        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-        </div>
-        <p class="text-xs tracking-widest uppercase text-earth-500 mb-3 font-medium">Pesanan Dikonfirmasi</p>
-        <h1 class="text-3xl font-light text-gray-900 mb-2">Terima kasih, {{ $order->customer_name }}! 🌿</h1>
-        <p class="text-gray-500 font-light">Pesanan kamu telah kami terima dan sedang diproses.</p>
-    </div>
-
-    {{-- Order Number --}}
-    <div class="bg-earth-50 rounded-2xl p-6 mb-8">
-        <p class="text-xs text-earth-500 font-light mb-2">Nomor Pesanan</p>
-        <p class="text-2xl font-semibold text-gray-900 tracking-wider">{{ $order->order_number }}</p>
-        <p class="text-xs text-gray-400 font-light mt-2">Konfirmasi dikirim ke <strong>{{ $order->customer_email }}</strong></p>
-    </div>
-
-    {{-- Order Items --}}
-    <div class="bg-white rounded-2xl p-6 shadow-sm mb-8 text-left">
-        <h2 class="text-sm font-semibold text-gray-900 mb-4">Item Pesanan</h2>
-        <div class="space-y-3">
-            @foreach($order->items as $item)
-            <div class="flex items-center justify-between py-2 border-b border-earth-50 last:border-0">
-                <div>
-                    <p class="text-sm font-medium text-gray-900">{{ $item->product_name }}</p>
-                    <p class="text-xs text-gray-400 font-light">{{ $item->variant_color }} · {{ $item->variant_size }} · Qty: {{ $item->quantity }}</p>
-                </div>
-                <p class="text-sm font-semibold text-gray-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</p>
+    {{-- Success / Paid Header Banner --}}
+    <div class="text-center mb-10">
+        @if($order->payment_status === 'paid' || $order->status === 'paid')
+            <div class="w-20 h-20 bg-forest-100 text-forest-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
             </div>
-            @endforeach
-        </div>
-        <div class="border-t border-earth-100 pt-4 mt-2">
-            <div class="flex justify-between text-sm">
-                <span class="text-gray-500">Subtotal</span>
-                <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
-            </div>
-            <div class="flex justify-between text-sm mt-1">
-                <span class="text-gray-500">Ongkos Kirim</span>
-                <span>Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
-            </div>
-            <div class="flex justify-between font-semibold mt-3 pt-3 border-t border-earth-100">
-                <span>Total</span>
-                <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
-            </div>
-        </div>
-    </div>
-
-    {{-- Payment Instructions --}}
-    <div class="bg-earth-50 rounded-2xl p-6 mb-8 text-left">
-        <h2 class="text-sm font-semibold text-gray-900 mb-3">
-            @if($order->payment_method === 'qris') Instruksi Pembayaran QRIS
-            @else Instruksi Transfer Bank
-            @endif
-        </h2>
-        @if($order->payment_method === 'qris')
-        <div class="text-center">
-            <div class="inline-block border-4 border-white shadow-md mx-auto mb-3">
-                <div class="w-40 h-40 bg-gray-900 flex items-center justify-center text-white text-5xl">▦</div>
-            </div>
-            <p class="text-xs text-gray-400 font-light">Scan QR di atas untuk membayar Rp {{ number_format($order->total, 0, ',', '.') }}</p>
-            <p class="text-xs text-earth-400 mt-2 font-light">(Ini adalah simulasi QR untuk tujuan portofolio)</p>
-        </div>
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 bg-green-50 border border-green-200 text-green-800 text-xs font-semibold uppercase tracking-wider rounded-full mb-3">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Pembayaran Terverifikasi (Lunas)
+            </span>
+            <h1 class="text-3xl font-light text-gray-900 mb-2">Terima kasih atas pesananmu, {{ $order->customer_name }}! 🌿</h1>
+            <p class="text-sm text-gray-500 font-light">Pembayaran Anda telah kami terima dan pesanan sedang disiapkan di gudang kami.</p>
         @else
-        <div class="space-y-2 text-sm text-gray-600">
-            <p class="font-light">Transfer ke rekening berikut:</p>
-            <div class="bg-white rounded-lg p-3 border border-earth-200">
-                <p><span class="text-gray-400 font-light">Bank:</span> BCA</p>
-                <p><span class="text-gray-400 font-light">No. Rekening:</span> <strong>1234567890</strong></p>
-                <p><span class="text-gray-400 font-light">A/N:</span> PT Allbirds Indonesia</p>
-                <p class="mt-2"><span class="text-gray-400 font-light">Jumlah:</span> <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong></p>
+            <div class="w-20 h-20 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             </div>
-        </div>
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold uppercase tracking-wider rounded-full mb-3">
+                Menunggu Pembayaran
+            </span>
+            <h1 class="text-3xl font-light text-gray-900 mb-2">Pesanan Dibuat, {{ $order->customer_name }}</h1>
+            <p class="text-sm text-gray-500 font-light">Selesaikan pembayaran sebelum batas waktu berakhir.</p>
         @endif
     </div>
 
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="{{ route('home') }}"
-           class="bg-gray-900 text-white px-10 py-4 text-xs tracking-widest uppercase font-medium hover:bg-earth-800 transition-colors">
-            Kembali Belanja
-        </a>
-        <a href="{{ route('products.index') }}"
-           class="border border-gray-200 text-gray-600 px-10 py-4 text-xs tracking-widest uppercase font-medium hover:border-gray-900 hover:text-gray-900 transition-colors">
-            Lihat Produk Lain
-        </a>
+    {{-- Order Summary Receipt Card --}}
+    <div class="bg-white rounded-3xl p-8 border border-earth-100 shadow-sm space-y-6">
+        
+        {{-- Order ID & Meta --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-earth-100 gap-4">
+            <div>
+                <p class="text-[10px] uppercase font-bold tracking-widest text-earth-600">Nomor Pesanan</p>
+                <p class="text-2xl font-mono font-bold text-gray-900 tracking-wider">{{ $order->order_number }}</p>
+            </div>
+            <div class="text-left sm:text-right">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Tanggal & Waktu</p>
+                <p class="text-xs font-medium text-gray-700">{{ $order->created_at->format('d F Y, H:i') }} WIB</p>
+            </div>
+        </div>
+
+        {{-- Ordered Items --}}
+        <div>
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-900 mb-4">Item yang Dipesan</h2>
+            <div class="divide-y divide-earth-100">
+                @foreach($order->items as $item)
+                @php $variant = $item->variant; @endphp
+                <div class="py-3.5 flex items-center justify-between gap-4 first:pt-0 last:pb-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-earth-50 rounded-xl overflow-hidden border border-earth-100 flex-shrink-0">
+                            <img src="{{ $variant?->image_url ?? 'https://via.placeholder.com/80' }}"
+                                 alt="{{ $item->product_name }}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-900">{{ $item->product_name }}</p>
+                            <p class="text-xs text-gray-400 font-light">
+                                {{ $item->variant_color }} &bull; Size {{ $item->variant_size }} &bull; Qty: {{ $item->quantity }}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-sm font-bold text-gray-900">
+                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                    </p>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Price Breakdown --}}
+        <div class="pt-4 border-t border-earth-100 space-y-2 text-xs">
+            <div class="flex justify-between text-gray-500 font-light">
+                <span>Subtotal Produk</span>
+                <span class="font-medium text-gray-900">Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between text-gray-500 font-light">
+                <span>Ongkos Kirim</span>
+                <span class="font-medium text-gray-900">Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}</span>
+            </div>
+            <div class="flex justify-between text-base font-bold text-gray-900 pt-3 border-t border-earth-100">
+                <span>Total Tagihan</span>
+                <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
+            </div>
+        </div>
+
+        {{-- Shipping Destination --}}
+        <div class="pt-6 border-t border-earth-100 bg-earth-50 rounded-2xl p-5 text-xs text-gray-700 space-y-1.5">
+            <p class="font-bold text-gray-900 uppercase tracking-wider text-[10px]">Tujuan Pengiriman:</p>
+            <p class="font-medium">{{ $order->customer_name }} ({{ $order->customer_phone ?? $order->customer_email }})</p>
+            <p class="font-light text-gray-600">{{ $order->shipping_address }}, {{ $order->city }} {{ $order->postal_code }}</p>
+            <p class="text-[11px] text-earth-700 font-medium pt-1">Metode Bayar: {{ strtoupper($order->payment_method) }}</p>
+        </div>
+
+        {{-- Action Buttons --}}
+        <div class="pt-4 flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{{ route('orders.invoice', $order->order_number) }}" target="_blank"
+               class="px-6 py-3.5 bg-earth-100 hover:bg-earth-200 text-earth-900 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+                <span>🖨️ Cetak / Unduh Invoice</span>
+            </a>
+            <a href="{{ route('products.index') }}"
+               class="px-6 py-3.5 bg-gray-900 hover:bg-earth-800 text-white rounded-xl text-xs font-semibold uppercase tracking-widest transition-colors flex items-center justify-center">
+                Lanjut Belanja Produk Lain →
+            </a>
+        </div>
+
     </div>
+
 </div>
 @endsection
