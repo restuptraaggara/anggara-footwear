@@ -10,18 +10,23 @@ import ScrollExpand from './components/ScrollExpand';
 import AccordionGallery from './components/AccordionGallery';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Mount Global Aurora WebGL Background
-  const auroraEl = document.getElementById('aurora-background');
-  if (auroraEl) {
-    const colorStops = auroraEl.dataset.colors 
-      ? JSON.parse(auroraEl.dataset.colors) 
-      : ['#0f291e', '#1b4332', '#1e293b'];
-    const blend = parseFloat(auroraEl.dataset.blend || '0.6');
-    const amplitude = parseFloat(auroraEl.dataset.amplitude || '1.2');
-    const speed = parseFloat(auroraEl.dataset.speed || '0.4');
+  // 1. Mount Global Aurora WebGL Background (React Bits)
+  const auroraTarget = document.getElementById('aurora-background');
+  if (auroraTarget) {
+    const colorStops = auroraTarget.dataset.colors 
+      ? JSON.parse(auroraTarget.dataset.colors) 
+      : ["#7cff67", "#B497CF", "#5227FF"];
+    const blend = parseFloat(auroraTarget.dataset.blend || "0.5");
+    const amplitude = parseFloat(auroraTarget.dataset.amplitude || "1.25");
+    const speed = parseFloat(auroraTarget.dataset.speed || "0.6");
 
-    createRoot(auroraEl).render(
-      <Aurora colorStops={colorStops} blend={blend} amplitude={amplitude} speed={speed} />
+    createRoot(auroraTarget).render(
+      <Aurora 
+        colorStops={colorStops} 
+        blend={blend} 
+        amplitude={amplitude} 
+        speed={speed} 
+      />
     );
   }
 

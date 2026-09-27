@@ -32,7 +32,7 @@
             </p>
             <div class="flex flex-col sm:flex-row gap-4 pt-2">
                 <a href="{{ route('products.index') }}" 
-                   class="inline-block bg-white hover:bg-emerald-50 text-gray-900 px-10 py-4 text-xs tracking-widest uppercase font-semibold transition-all duration-200 text-center rounded-xl shadow-lg hover:scale-105">
+                   class="inline-block bg-white hover:bg-emerald-50 text-white px-10 py-4 text-xs tracking-widest uppercase font-semibold transition-all duration-200 text-center rounded-xl shadow-lg hover:scale-105">
                     Jelajahi Katalog
                 </a>
                 <a href="#signature" 
@@ -66,12 +66,12 @@
                      class="w-full h-full object-cover">
             </div>
             {{-- Floating badge --}}
-            <div class="absolute -bottom-4 -left-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-5 max-w-[220px] border border-earth-100 text-gray-900">
+            <div class="absolute -bottom-4 -left-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl p-5 max-w-[220px] border border-white/10 text-white">
                 <div class="flex items-center gap-1.5 mb-1 text-amber-500">
                     <span class="text-xs">★★★★★</span>
-                    <span class="text-xs font-bold text-gray-900 ml-1">4.9 / 5</span>
+                    <span class="text-xs font-bold text-white ml-1">4.9 / 5</span>
                 </div>
-                <p class="text-[11px] text-gray-600 font-light leading-tight">Dipercaya lebih dari 12,000+ pelanggan di seluruh dunia</p>
+                <p class="text-[11px] text-gray-300 font-light leading-tight">Dipercaya lebih dari 12,000+ pelanggan di seluruh dunia</p>
             </div>
         </div>
     </div>
@@ -113,12 +113,12 @@
 <section class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
     <div class="text-center mb-12">
         <p class="text-xs tracking-widest uppercase text-earth-600 mb-2 font-medium">Kategori Pilihan</p>
-        <h2 class="text-3xl font-light text-gray-900">Temukan Gaya Kamu</h2>
+        <h2 class="text-3xl font-light text-white">Temukan Gaya Kamu</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         @foreach($categories as $cat)
         <a href="{{ route('products.index', ['category' => $cat->slug]) }}" 
-           class="group relative aspect-[3/4] overflow-hidden rounded-3xl bg-earth-100 block shadow-sm hover:shadow-xl transition-all duration-500">
+           class="group relative aspect-[3/4] overflow-hidden rounded-3xl bg-white/10 block shadow-sm hover:shadow-xl transition-all duration-500">
             @php
                 $catImages = [
                     'men' => 'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&q=80',
@@ -139,16 +139,16 @@
 </section>
 
 {{-- SUSTAINABLE STORY SECTION --}}
-<section id="story" class="py-24 bg-white border-t border-earth-100">
+<section id="story" class="py-24 bg-[#090b10]/60 backdrop-blur-md border-t border-white/10 text-white">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             {{-- Images Grid --}}
             <div class="grid grid-cols-2 gap-4">
-                <div class="aspect-[3/4] rounded-3xl overflow-hidden bg-earth-100 shadow-sm">
+                <div class="aspect-[3/4] rounded-3xl overflow-hidden bg-white/10 shadow-sm">
                     <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" 
                          alt="Sustainable manufacturing" class="w-full h-full object-cover">
                 </div>
-                <div class="aspect-[3/4] rounded-3xl overflow-hidden bg-earth-100 mt-8 shadow-sm">
+                <div class="aspect-[3/4] rounded-3xl overflow-hidden bg-white/10 mt-8 shadow-sm">
                     <img src="https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=600&q=80" 
                          alt="Natural materials" class="w-full h-full object-cover">
                 </div>
@@ -158,29 +158,29 @@
             <div class="space-y-8">
                 <div>
                     <p class="text-xs tracking-widest uppercase text-forest-600 mb-3 font-medium">Misi Berkelanjutan</p>
-                    <h2 class="text-4xl font-light text-gray-900 leading-snug">
+                    <h2 class="text-4xl font-light text-white leading-snug">
                         Fashion yang bertanggung jawab <br>
                         <span class="font-semibold text-forest-700">untuk bumi yang lebih hijau.</span>
                     </h2>
                 </div>
-                <p class="text-base text-gray-500 leading-relaxed font-light">
+                <p class="text-base text-gray-300 leading-relaxed font-light">
                     Kami percaya bahwa industri alas kaki tidak harus mengorbankan planet. Setiap produk 
                     Allbirds dibuat dari bahan-bahan alami — wol merino ZQ, serat eucalyptus, karet tebu — 
                     yang diproses secara etis dan bersertifikasi ramah lingkungan.
                 </p>
                 
                 {{-- Stats --}}
-                <div class="grid grid-cols-3 gap-6 py-6 border-y border-earth-100">
+                <div class="grid grid-cols-3 gap-6 py-6 border-y border-white/10">
                     <div>
-                        <p class="text-2xl font-bold text-gray-900 mb-1">95%</p>
+                        <p class="text-2xl font-bold text-white mb-1">95%</p>
                         <p class="text-xs text-gray-400 font-light leading-relaxed">Material terbarukan</p>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-gray-900 mb-1">7.6 kg</p>
+                        <p class="text-2xl font-bold text-white mb-1">7.6 kg</p>
                         <p class="text-xs text-gray-400 font-light leading-relaxed">CO₂e rata-rata</p>
                     </div>
                     <div>
-                        <p class="text-2xl font-bold text-gray-900 mb-1">100%</p>
+                        <p class="text-2xl font-bold text-white mb-1">100%</p>
                         <p class="text-xs text-gray-400 font-light leading-relaxed">Energi terbarukan</p>
                     </div>
                 </div>
@@ -190,21 +190,21 @@
                     <div class="flex items-start gap-4">
                         <span class="text-2xl">🌿</span>
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-0.5">Serat Eucalyptus</h4>
+                            <h4 class="text-sm font-semibold text-white mb-0.5">Serat Eucalyptus</h4>
                             <p class="text-xs text-gray-400 font-light">Lebih lembut dari sutra, diproduksi dengan 95% lebih sedikit air.</p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
                         <span class="text-2xl">🐑</span>
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-0.5">ZQ Merino Wool</h4>
+                            <h4 class="text-sm font-semibold text-white mb-0.5">ZQ Merino Wool</h4>
                             <p class="text-xs text-gray-400 font-light">Standar etika peternakan wol tertinggi di dunia, naturally breathable.</p>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">
                         <span class="text-2xl">🎋</span>
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-0.5">SweetFoam® Sugar Cane</h4>
+                            <h4 class="text-sm font-semibold text-white mb-0.5">SweetFoam® Sugar Cane</h4>
                             <p class="text-xs text-gray-400 font-light">Sol pertama di dunia berbahan dasar tebu manis pengganti busa EVA sintetis.</p>
                         </div>
                     </div>
@@ -230,7 +230,7 @@
         <form class="flex gap-3 max-w-md mx-auto pt-4" onsubmit="event.preventDefault(); alert('Terima kasih telah bergabung!');">
             <input type="email" placeholder="email@kamu.com" required
                    class="flex-1 bg-gray-800 text-white placeholder-gray-500 px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-400 rounded-xl border border-gray-700">
-            <button type="submit" class="bg-white text-gray-900 px-6 py-3 text-xs tracking-widest uppercase font-semibold hover:bg-emerald-50 transition-colors rounded-xl shadow-sm">
+            <button type="submit" class="bg-white text-white px-6 py-3 text-xs tracking-widest uppercase font-semibold hover:bg-emerald-50 transition-colors rounded-xl shadow-sm">
                 Daftar
             </button>
         </form>

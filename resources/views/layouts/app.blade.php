@@ -19,12 +19,12 @@
     </style>
     @stack('styles')
 </head>
-<body class="relative min-h-screen bg-[#0d1712] text-gray-100 antialiased selection:bg-emerald-500 selection:text-white" x-data="appState()"
+<body class="relative min-h-screen bg-transparent text-gray-100 antialiased selection:bg-emerald-400 selection:text-gray-950" x-data="appState()"
       @cart-updated.window="refreshCart()"
       @add-to-cart.window="addToCart($event.detail.variantId)"
       @wishlist-updated.window="loadWishlist()">
     {{-- Global Aurora WebGL Background --}}
-    <div id="aurora-background" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden"></div>
+    <div id="aurora-background" class="fixed inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden bg-[#090b10]"></div>
 
 
     {{-- Announcement Bar --}}

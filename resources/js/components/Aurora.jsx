@@ -84,24 +84,23 @@ void main() {
   float height = snoise(vec2(uv.x * 2.0 + uTime * 0.1, uTime * 0.15)) * 0.5 * uAmplitude;
   height = exp(height);
   height = (uv.y * 2.0 - height + 0.2);
-  float intensity = 0.6 * height;
+  float intensity = 0.65 * height;
 
   float midPoint = 0.20;
   float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
 
   vec3 auroraColor = intensity * rampColor;
-  fragColor = vec4(auroraColor * auroraAlpha, auroraAlpha * 0.75);
+  fragColor = vec4(auroraColor * auroraAlpha, auroraAlpha * 0.85);
 }
 `;
 
-export default function Aurora(props) {
-  const {
-    colorStops = ["#0f291e", "#1b4332", "#1e293b"],
-    amplitude = 1.0,
-    blend = 0.5,
-    speed = 0.8,
-  } = props;
-
+export default function Aurora({
+  colorStops = ["#7cff67", "#B497CF", "#5227FF"],
+  amplitude = 1.25,
+  blend = 0.5,
+  speed = 0.6,
+  lightMode = false,
+}) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -147,9 +146,9 @@ export default function Aurora(props) {
     let lastTime = 0;
 
     const resize = () => {
-      if (!container) return;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
+      if (!container || !renderer) return;
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
       renderer.setSize(width, height);
       program.uniforms.uResolution.value = [width, height];
     };
@@ -173,7 +172,7 @@ export default function Aurora(props) {
         gl.canvas.parentNode.removeChild(gl.canvas);
       }
     };
-  }, [colorStops, amplitude, blend, speed]);
+  }, [colorStops, amplitude, blend, speed, lightMode]);
 
   return <div ref={containerRef} className="aurora-container" />;
 }
