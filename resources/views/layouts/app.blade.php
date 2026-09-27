@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Allbirds Store — Naturally Comfortable')</title>
+    <title>@yield('title', 'Anggara Footwear — Sustainable Comfort')</title>
 
     {{-- Vite compiled CSS --}}
-    @vite(['resources/css/app.css', 'resources/js/app.jsxx'])
+    @vite(['resources/css/app.css', 'resources/js/app.jsx'])
     {{-- Google Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -181,7 +181,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-xs text-earth-500 font-light">© {{ date('Y') }} Allbirds Store — Portfolio Project</p>
+                <p class="text-xs text-earth-500 font-light">© {{ date('Y') }} Anggara Footwear — Sustainable Comfort</p>
                 <span class="text-xs text-earth-500">🌿 Carbon Neutral Certified</span>
             </div>
         </div>

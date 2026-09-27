@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Panel') — Allbirds Store</title>
+    <title>@yield('title', 'Admin Panel') — Anggara Footwear</title>
 
     {{-- Vite CSS --}}
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
@@ -142,7 +142,7 @@
 
         {{-- Admin Footer --}}
         <footer class="bg-white border-t border-earth-100 px-6 py-4 text-center text-xs text-gray-400 font-light">
-            Allbirds Store Management System &bull; Portfolio Full-Stack Project
+            Anggara Footwear Management System &bull; Portfolio Full-Stack Project
         </footer>
     </div>
 
