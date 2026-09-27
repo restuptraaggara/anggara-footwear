@@ -7,14 +7,15 @@
      x-data="{
         selectedColor: '{{ $product->variants->first()?->color_name }}',
         selectedColorHex: '{{ $product->variants->first()?->color_hex }}',
-        selectedSize: '{{ $product->variants->first()?->size }}',
-        selectedVariantId: {{ $product->variants->first()?->id ?? 'null' }},
-        currentStock: {{ $product->variants->first()?->stock ?? 0 }},
+        selectedSize: null,
+        selectedVariantId: null,
+        currentStock: null,
         currentImage: '{{ $product->variants->first()?->image_url }}',
         variants: {{ json_encode($product->variants->groupBy('color_name')->map(fn($v) => ['hex' => $v->first()->color_hex, 'image' => $v->first()->image_url, 'sizes' => $v->map(fn($s) => ['id' => $s->id, 'size' => $s->size, 'stock' => $s->stock])->values()])->toArray()) }},
         
         fitFinderOpen: false,
         footLengthCm: 25.5,
+        sizeErrorAlert: false,
         waNumber: '{{ config('services.whatsapp.number', '6281234567890') }}',
         productName: '{{ addslashes($product->name) }}',
         productPrice: '{{ $product->formatted_price }}',
@@ -34,7 +35,7 @@
         },
 
         get calculatedDesc() {
-            return `Sesuai untuk panjang kaki ${this.footLengthCm} cm dengan ruang gerak jari kaki alami.`;
+            return `Sesuai untuk panjang telapak kaki ${this.footLengthCm} cm dengan ruang gerak jari yang leluasa.`;
         },
 
         applyRecommendedSize() {
@@ -49,10 +50,12 @@
             this.selectedSize = null;
             this.selectedVariantId = null;
             this.currentStock = null;
+            this.sizeErrorAlert = false;
         },
 
         selectSize(size) {
             this.selectedSize = size;
+            this.sizeErrorAlert = false;
             const colorData = this.variants[this.selectedColor];
             if (colorData) {
                 const sizeData = colorData.sizes.find(s => s.size === size);
@@ -65,14 +68,43 @@
             return this.variants[this.selectedColor]?.sizes || [];
         },
 
-        canAddToCart() {
+        canProceed() {
             return this.selectedVariantId !== null && this.currentStock > 0;
+        },
+
+        handleAddToCart() {
+            if (!this.selectedSize) {
+                this.sizeErrorAlert = true;
+                return;
+            }
+            if (!this.canProceed()) {
+                alert('Varian ukuran ini sedang habis stok.');
+                return;
+            }
+            $dispatch('add-to-cart', { variantId: this.selectedVariantId });
+        },
+
+        handleDirectCheckout() {
+            if (!this.selectedSize) {
+                this.sizeErrorAlert = true;
+                return;
+            }
+            if (!this.canProceed()) {
+                alert('Varian ukuran ini sedang habis stok.');
+                return;
+            }
+            
+            const body = document.querySelector('body');
+            const app = Alpine.$data(body);
+            if (app && app.directCheckout) {
+                app.directCheckout(this.selectedVariantId, 1);
+            }
         },
 
         getWhatsAppUrl() {
             const color = this.selectedColor || '-';
-            const size = this.selectedSize || '-';
-            const msg = `Halo Anggara Footwear, saya tertarik untuk memesan:\n• Produk: ${this.productName}\n• Warna: ${color}\n• Ukuran: EU ${size}\n• Harga: ${this.productPrice}\n\nMohon info ketersediaan stok & panduan pembayarannya. Terima kasih!`;
+            const size = this.selectedSize ? 'EU ' + this.selectedSize : '(Belum pilih ukuran)';
+            const msg = `Halo Anggara Footwear, saya mau pesan:\n• Produk: ${this.productName}\n• Warna: ${color}\n• Ukuran: ${size}\n• Harga: ${this.productPrice}\n\nMohon info ketersediaan stok & cara pembayaran langsung. Terima kasih!`;
             return `https://wa.me/${this.waNumber}?text=${encodeURIComponent(msg)}`;
         }
      }">
@@ -106,8 +138,8 @@
                 @foreach($product->variants->unique('color_name') as $variant)
                 <button 
                     @click="selectColor('{{ $variant->color_name }}', '{{ $variant->color_hex }}', '{{ $variant->image_url }}')"
-                    :class="selectedColor === '{{ $variant->color_name }}' ? 'border-gray-900 ring-1 ring-gray-900' : 'border-earth-100 opacity-60 hover:opacity-100'"
-                    class="aspect-square rounded-xl overflow-hidden border-2 transition-all bg-earth-50">
+                    :class="selectedColor === '{{ $variant->color_name }}' ? 'border-gray-900 ring-2 ring-gray-900' : 'border-earth-100 opacity-60 hover:opacity-100'"
+                    class="aspect-square rounded-2xl overflow-hidden border-2 transition-all bg-earth-50">
                     <img src="{{ $variant->image_url }}" alt="{{ $variant->color_name }}" class="w-full h-full object-cover">
                 </button>
                 @endforeach
@@ -146,7 +178,7 @@
             {{-- Size Selector + Dynamic Stock Indicator + Fit Finder --}}
             <div class="pt-4 border-t border-earth-100 space-y-3">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-900">Pilih Ukuran:</span>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-900">Pilih Ukuran Sepatu (Wajib):</span>
                     <button type="button" 
                             @click="fitFinderOpen = true" 
                             class="text-xs text-forest-700 hover:text-forest-900 font-semibold underline underline-offset-2 flex items-center gap-1 cursor-pointer transition-colors">
@@ -157,6 +189,7 @@
                 <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     <template x-for="sizeData in getSizesForColor()" :key="sizeData.size">
                         <button 
+                            type="button"
                             @click="selectSize(sizeData.size)"
                             :disabled="sizeData.stock === 0"
                             :class="{
@@ -164,10 +197,16 @@
                                 'bg-white border-earth-200 text-gray-700 hover:border-gray-900 hover:text-gray-900': selectedSize !== sizeData.size && sizeData.stock > 0,
                                 'bg-earth-50 border-earth-100 text-gray-300 cursor-not-allowed line-through': sizeData.stock === 0
                             }"
-                            class="border rounded-xl py-3 text-xs font-medium transition-all text-center">
+                            class="border rounded-xl py-3 text-xs font-semibold transition-all text-center">
                             <span x-text="sizeData.size"></span>
                         </button>
                     </template>
+                </div>
+
+                {{-- Alert when size not selected --}}
+                <div x-show="sizeErrorAlert" class="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-xs flex items-center gap-2 animate-bounce" x-cloak>
+                    <span>⚠️</span>
+                    <span>Silakan pilih salah satu ukuran sepatu di atas terlebih dahulu.</span>
                 </div>
 
                 {{-- Stock Status Indicator --}}
@@ -192,21 +231,47 @@
                         </div>
                     </template>
                     <template x-if="!selectedSize">
-                        <p class="text-xs text-earth-500 font-light">Pilih ukuran terlebih dahulu untuk melihat ketersediaan stok.</p>
+                        <p class="text-xs text-earth-500 font-light">Pilih ukuran untuk melihat ketersediaan stok dan melanjutkan pembelian.</p>
                     </template>
                 </div>
             </div>
 
-            {{-- Action Buttons: Add to Cart, Wishlist & WhatsApp --}}
+            {{-- 2 DUAL PURCHASE OPTIONS + WHATSAPP ALTERNATIVE --}}
             <div class="space-y-3 pt-4 border-t border-earth-100">
-                <button 
-                    type="button"
-                    @click="if(canAddToCart()) { $dispatch('add-to-cart', { variantId: selectedVariantId }); } else { alert('Pilih ukuran yang tersedia terlebih dahulu!'); }"
-                    :class="canAddToCart() ? 'bg-gray-900 hover:bg-forest-800 cursor-pointer shadow-md' : 'bg-gray-300 cursor-not-allowed opacity-75'"
-                    class="w-full text-white py-4 rounded-xl text-xs tracking-widest uppercase font-bold transition-all duration-200">
-                    Tambah ke Keranjang
-                </button>
+                
+                {{-- Dual Primary Buttons Grid --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    
+                    {{-- Option 1: Add to Cart Drawer --}}
+                    <button 
+                        type="button"
+                        @click="handleAddToCart()"
+                        :class="selectedSize ? 'bg-white border-2 border-gray-900 text-gray-900 hover:bg-earth-100 shadow-sm' : 'bg-gray-100 border border-gray-200 text-gray-400 cursor-pointer'"
+                        class="w-full py-4 rounded-2xl text-xs tracking-widest uppercase font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>🛒 Tambah ke Keranjang</span>
+                    </button>
 
+                    {{-- Option 2: Direct Website Checkout --}}
+                    <button 
+                        type="button"
+                        @click="handleDirectCheckout()"
+                        :class="selectedSize ? 'bg-gray-900 hover:bg-forest-800 text-white shadow-md hover:shadow-lg' : 'bg-gray-200 text-gray-400 cursor-pointer'"
+                        class="w-full py-4 rounded-2xl text-xs tracking-widest uppercase font-bold transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>⚡ Beli Sekarang</span>
+                    </button>
+                </div>
+
+                {{-- Secondary WhatsApp Alternative --}}
+                <div class="pt-1">
+                    <a :href="getWhatsAppUrl()"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="w-full py-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs tracking-wider uppercase font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
+                        <span>💬 Pesan via WhatsApp (Chat Admin)</span>
+                    </a>
+                </div>
+
+                {{-- Wishlist Toggle Button --}}
                 <button type="button"
                         @click="toggleWishlist({
                             id: {{ $product->id }},
@@ -218,22 +283,14 @@
                             image_url: currentImage,
                             first_variant_id: selectedVariantId || {{ $product->variants->first()?->id ?? 'null' }}
                         })"
-                        class="w-full border border-earth-200 rounded-xl py-3.5 text-xs tracking-widest uppercase font-medium transition-all flex items-center justify-center gap-2 hover:border-gray-900"
-                        :class="isInWishlist({{ $product->id }}) ? 'bg-red-50 border-red-200 text-red-600' : 'text-gray-700 hover:text-gray-900'">
-                    <svg class="h-4 w-4" :fill="isInWishlist({{ $product->id }}) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+                        class="w-full border border-earth-200 rounded-xl py-2.5 text-[11px] tracking-wider uppercase font-medium transition-all flex items-center justify-center gap-2 hover:border-gray-900 mt-1"
+                        :class="isInWishlist({{ $product->id }}) ? 'bg-red-50 border-red-200 text-red-600' : 'text-gray-600 hover:text-gray-900'">
+                    <svg class="h-3.5 w-3.5" :fill="isInWishlist({{ $product->id }}) ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
                     <span x-text="isInWishlist({{ $product->id }}) ? 'Tersimpan di Wishlist' : 'Simpan ke Wishlist'"></span>
                 </button>
-
-                {{-- Direct WhatsApp Button --}}
-                <a :href="getWhatsAppUrl()"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs tracking-wider uppercase font-semibold transition-all duration-200 shadow-sm flex items-center justify-center gap-2">
-                    <span>💬 Pesan Cepat via WhatsApp</span>
-                </a>
             </div>
 
             {{-- Free Shipping & Guarantee Badges --}}

@@ -31,7 +31,7 @@
             {{-- Admin Brand --}}
             <div class="h-16 flex items-center justify-between px-6 border-b border-gray-800">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                    <span class="text-lg font-bold tracking-widest uppercase text-white">ALLBIRDS</span>
+                    <span class="text-lg font-bold tracking-widest uppercase text-white">ANGGARA ADMIN</span>
                     <span class="text-[10px] tracking-wider uppercase px-2 py-0.5 bg-earth-800 text-earth-300 rounded font-medium">ADMIN</span>
                 </a>
                 <button @click="sidebarOpen = false" class="lg:hidden text-gray-400 hover:text-white">

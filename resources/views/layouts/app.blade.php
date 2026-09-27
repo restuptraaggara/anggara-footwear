@@ -38,8 +38,8 @@
             <div class="flex items-center justify-between h-16">
 
                 {{-- Logo --}}
-                <a href="{{ route('home') }}" class="text-xl font-semibold tracking-widest uppercase text-white flex-shrink-0">
-                    Allbirds
+                <a href="{{ route('home') }}" class="text-xl font-bold tracking-widest uppercase text-white flex-shrink-0 flex items-center gap-2">
+                    <span class="text-emerald-400">🌿</span> ANGGARA
                 </a>
 
                 {{-- Nav Links (hidden when search open) --}}
@@ -155,7 +155,7 @@
         <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
                 <div>
-                    <p class="text-xl font-semibold tracking-widest uppercase text-white mb-4">Allbirds</p>
+                    <p class="text-xl font-semibold tracking-widest uppercase text-white mb-4">ANGGARA</p>
                     <p class="text-sm text-earth-400 leading-relaxed font-light">Dibuat dari bahan alami, dirancang untuk kenyamanan maksimal, berkomitmen pada masa depan yang berkelanjutan.</p>
                 </div>
                 <div>
@@ -194,27 +194,16 @@
          GLOBAL APP STATE (Alpine.js)
          Manages: Cart + Wishlist
     ========================================================= --}}
+    
     <script>
     function appState() {
         return {
-        getCartWhatsAppUrl() {
-            const waNumber = '{{ config('services.whatsapp.number', '6281234567890') }}';
-            if (!this.cart || !this.cart.items || this.cart.items.length === 0) {
-                return `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Anggara Footwear, saya mau tanya tentang koleksi sepatu ramah lingkungan.')}`;
-            }
-
-            let msg = 'Halo Anggara Footwear, saya mau pesan:\n';
-            this.cart.items.forEach(item => {
-                msg += `• ${item.product_name} - Warna: ${item.color_name} - Size: ${item.size} (Qty: ${item.quantity}) - ${item.formatted_subtotal}\n`;
-            });
-            msg += `\nTotal: ${this.cart.formatted_total || ''}\nMohon info ketersediaan stok dan cara pembayaran. Terima kasih!`;
-            return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
-        },
-
             // Cart state
             openCart: false,
             cartCount: 0,
             cartItems: [],
+            cartSubtotal: 'Rp 0',
+            cartShipping: 'Gratis',
             cartTotal: 'Rp 0',
             cartLoading: false,
 
@@ -231,20 +220,27 @@
             // ── CART ──────────────────────────────────────────
             async refreshCart() {
                 try {
-                    const res = await fetch('/cart', {
-                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+                    const res = await fetch('{{ route("cart.index") }}', {
+                        headers: { 
+                            'Accept': 'application/json', 
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content 
+                        }
                     });
                     const data = await res.json();
-                    this.cartCount = data.count;
-                    this.cartItems = data.items;
-                    this.cartTotal = data.total_formatted;
-                } catch(e) {}
+                    this.cartCount = data.count || 0;
+                    this.cartItems = data.items || [];
+                    this.cartSubtotal = data.subtotal_formatted || 'Rp 0';
+                    this.cartShipping = data.shipping_formatted || 'Gratis';
+                    this.cartTotal = data.total_formatted || 'Rp 0';
+                } catch(e) {
+                    console.error('Failed to refresh cart:', e);
+                }
             },
 
-            async addToCart(variantId, quantity = 1) {
+            async addToCart(variantId, quantity = 1, openDrawer = true) {
                 this.cartLoading = true;
                 try {
-                    const res = await fetch('/cart/add', {
+                    const res = await fetch('{{ route("cart.add") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -255,40 +251,102 @@
                     });
                     const data = await res.json();
                     if (res.ok) {
-                        this.cartCount = data.cart_count;
-                        await this.refreshCart();
-                        this.openCart = true;
+                        this.cartCount = data.count || 0;
+                        this.cartItems = data.items || [];
+                        this.cartSubtotal = data.subtotal_formatted || 'Rp 0';
+                        this.cartShipping = data.shipping_formatted || 'Gratis';
+                        this.cartTotal = data.total_formatted || 'Rp 0';
+                        if (openDrawer) {
+                            this.openCart = true;
+                        }
+                        return true;
                     } else {
                         alert(data.error || 'Gagal menambahkan ke keranjang');
+                        return false;
                     }
+                } catch (e) {
+                    console.error(e);
+                    alert('Terjadi kesalahan koneksi.');
+                    return false;
                 } finally {
                     this.cartLoading = false;
                 }
             },
 
+            async directCheckout(variantId, quantity = 1) {
+                const success = await this.addToCart(variantId, quantity, false);
+                if (success) {
+                    window.location.href = '{{ route("checkout") }}';
+                }
+            },
+
             async updateQuantity(cartId, quantity) {
-                const res = await fetch(`/cart/${cartId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
-                    body: JSON.stringify({ quantity })
-                });
-                const data = await res.json();
-                this.cartItems = data.items; this.cartTotal = data.total_formatted; this.cartCount = data.count;
+                try {
+                    const res = await fetch('{{ route("cart.update") }}', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Accept': 'application/json', 
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content 
+                        },
+                        body: JSON.stringify({ cart_id: cartId, quantity })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        this.cartCount = data.count || 0;
+                        this.cartItems = data.items || [];
+                        this.cartSubtotal = data.subtotal_formatted || 'Rp 0';
+                        this.cartShipping = data.shipping_formatted || 'Gratis';
+                        this.cartTotal = data.total_formatted || 'Rp 0';
+                    } else {
+                        alert(data.error || 'Gagal mengubah jumlah item');
+                    }
+                } catch(e) {
+                    console.error(e);
+                }
             },
 
             async removeItem(cartId) {
-                const res = await fetch(`/cart/${cartId}`, {
-                    method: 'DELETE',
-                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
-                });
-                const data = await res.json();
-                this.cartItems = data.items; this.cartTotal = data.total_formatted; this.cartCount = data.count;
+                try {
+                    const res = await fetch('{{ route("cart.remove") }}', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json', 
+                            'Accept': 'application/json', 
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content 
+                        },
+                        body: JSON.stringify({ cart_id: cartId })
+                    });
+                    const data = await res.json();
+                    this.cartCount = data.count || 0;
+                    this.cartItems = data.items || [];
+                    this.cartSubtotal = data.subtotal_formatted || 'Rp 0';
+                    this.cartShipping = data.shipping_formatted || 'Gratis';
+                    this.cartTotal = data.total_formatted || 'Rp 0';
+                } catch(e) {
+                    console.error(e);
+                }
             },
 
-            // ── WISHLIST (LocalStorage) ───────────────────────
+            getCartWhatsAppUrl() {
+                const waNumber = '{{ config("services.whatsapp.number", "6281234567890") }}';
+                if (!this.cartItems || this.cartItems.length === 0) {
+                    return `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Anggara Footwear, saya mau tanya tentang koleksi sepatu ramah lingkungan.')}`;
+                }
+
+                let msg = 'Halo Anggara Footwear, saya mau pesan:\n';
+                this.cartItems.forEach(item => {
+                    msg += `• ${item.product_name} - Warna: ${item.color_name} - Size: ${item.size} (Qty: ${item.quantity}) - ${item.subtotal_formatted}\n`;
+                });
+                msg += `\nTotal Tagihan: ${this.cartTotal}\nMohon info nomor rekening / QRIS untuk pembayaran. Terima kasih!`;
+                return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+            },
+
+            // ── WISHLIST (LocalStorage) ──────────────────────
             loadWishlist() {
                 try {
-                    this.wishlistItems = JSON.parse(localStorage.getItem('allbirds_wishlist') || '[]');
+                    const saved = localStorage.getItem('anggara_wishlist');
+                    this.wishlistItems = saved ? JSON.parse(saved) : [];
                     this.wishlistCount = this.wishlistItems.length;
                 } catch(e) {
                     this.wishlistItems = [];
@@ -297,9 +355,9 @@
             },
 
             saveWishlist() {
-                localStorage.setItem('allbirds_wishlist', JSON.stringify(this.wishlistItems));
+                localStorage.setItem('anggara_wishlist', JSON.stringify(this.wishlistItems));
                 this.wishlistCount = this.wishlistItems.length;
-                window.dispatchEvent(new CustomEvent('wishlist-storage-updated'));
+                window.dispatchEvent(new CustomEvent('wishlist-updated'));
             },
 
             isInWishlist(productId) {
@@ -308,7 +366,7 @@
 
             toggleWishlist(product) {
                 const idx = this.wishlistItems.findIndex(item => item.id === product.id);
-                if (idx >= 0) {
+                if (idx > -1) {
                     this.wishlistItems.splice(idx, 1);
                 } else {
                     this.wishlistItems.push(product);
@@ -319,51 +377,10 @@
             removeFromWishlist(productId) {
                 this.wishlistItems = this.wishlistItems.filter(item => item.id !== productId);
                 this.saveWishlist();
-            },
-
-            addWishlistItemToCart(item) {
-                // Add first variant of wishlist product to cart
-                if (item.first_variant_id) {
-                    this.addToCart(item.first_variant_id, 1);
-                    this.openWishlist = false;
-                    this.openCart = true;
-                }
-            },
-
-            formatPrice(amount) {
-                return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
             }
-        };
-    }
-
-    // ── NAVBAR SEARCH ─────────────────────────────────────────
-    function navSearch() {
-        return {
-            query: '',
-            results: [],
-            loading: false,
-
-            async fetchResults() {
-                if (this.query.length < 2) { this.results = []; return; }
-                this.loading = true;
-                try {
-                    const res = await fetch(`/products/search?q=${encodeURIComponent(this.query)}`, {
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    const data = await res.json();
-                    this.results = data.results || [];
-                } finally {
-                    this.loading = false;
-                }
-            },
-
-            goSearch() {
-                window.location.href = `/products?search=${encodeURIComponent(this.query)}`;
-            }
-        };
+        }
     }
     </script>
 
-    @stack('scripts')
 </body>
 </html>

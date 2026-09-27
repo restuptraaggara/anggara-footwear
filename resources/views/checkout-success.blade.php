@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Status Pesanan ' . $order->order_number . ' — Allbirds Store')
+@section('title', 'Status Pesanan ' . $order->order_number . ' — Anggara Footwear')
 
 @section('content')
 <div class="max-w-3xl mx-auto px-6 py-16">
