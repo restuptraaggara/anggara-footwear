@@ -13,6 +13,14 @@
 
 ## ✨ Fitur Utama
 
+### 🚀 Update Stage 1: UX Enhancements & Interactive Features
+- 🔍 **Live Instant Search**: Search bar di navbar dan input pencarian langsung di halaman katalog dengan debounce.
+- 🎛️ **Multi-Facet Filter**: Filter multi-dimensi berdasarkan Kategori, Tipe Material Alami, dan Ukuran Sepatu secara AJAX tanpa reload halaman.
+- ❤️ **Wishlist System**: Simpan produk favorit via LocalStorage, sinkronisasi counter navbar real-time, halaman `/wishlist` mandiri dan modal slide-over drawer.
+- 📊 **Dynamic Stock Indicator**: Indikator ketersediaan stok real-time saat memilih ukuran (Stok Tersedia, Stok Menipis <5, Stok Habis).
+- 🎨 **Enhanced Swatch Hover**: Preview gambar varian warna secara langsung saat cursor diarahkan ke swatch.
+
+
 | Fitur | Deskripsi |
 |-------|-----------|
 | 🏠 **Homepage** | Announcement bar, sticky navbar, hero banner, featured products, sustainable story section |
