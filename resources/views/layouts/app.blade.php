@@ -197,6 +197,20 @@
     <script>
     function appState() {
         return {
+        getCartWhatsAppUrl() {
+            const waNumber = '{{ config('services.whatsapp.number', '6281234567890') }}';
+            if (!this.cart || !this.cart.items || this.cart.items.length === 0) {
+                return `https://wa.me/${waNumber}?text=${encodeURIComponent('Halo Anggara Footwear, saya mau tanya tentang koleksi sepatu ramah lingkungan.')}`;
+            }
+
+            let msg = 'Halo Anggara Footwear, saya mau pesan:\n';
+            this.cart.items.forEach(item => {
+                msg += `• ${item.product_name} - Warna: ${item.color_name} - Size: ${item.size} (Qty: ${item.quantity}) - ${item.formatted_subtotal}\n`;
+            });
+            msg += `\nTotal: ${this.cart.formatted_total || ''}\nMohon info ketersediaan stok dan cara pembayaran. Terima kasih!`;
+            return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+        },
+
             // Cart state
             openCart: false,
             cartCount: 0,

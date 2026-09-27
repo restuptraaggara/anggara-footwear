@@ -95,6 +95,23 @@ Aplikasi ini dibangun dari nol (*scratch*) dengan arsitektur modern yang mencaku
 
 ---
 
+
+### 🌟 Fitur Ekstra Unggulan Portofolio
+1. **📏 Kalkulator Ukuran Kaki (Fit Finder):**
+   - Modal interaktif di halaman PDP untuk mengukur panjang telapak kaki (cm).
+   - Menghitung dan merekomendasikan ukuran EU yang pas secara cerdas, dengan tombol *"Pilih Ukuran Ini"* yang langsung memilih radio size varian secara otomatis.
+2. **💬 Direct WhatsApp Checkout Alternative:**
+   - Tombol pesan cepat via WhatsApp di PDP, Cart Drawer, dan Checkout dengan format pesan pre-filled rapi.
+3. **🏷️ Sistem Kupon & Voucher Diskon:**
+   - Tabel `coupons` dengan kalkulasi diskon persentase (%) dan potongan tetap (Rp).
+   - Input voucher AJAX di checkout dengan diskon real-time dan pencatatan riwayat promo.
+   - Admin CRUD Kupon di `/admin/coupons` lengkap dengan kuota pemakaian dan toggle status aktif/nonaktif.
+4. **📊 Export Laporan Penjualan & Invoice PDF:**
+   - Download rekap data pesanan CSV/Excel langsung dari `/admin/orders/export`.
+   - Cetak Invoice resmi print-optimized dengan branding Anggara Footwear.
+
+---
+
 ## 🗃️ Arsitektur Database (Database Schema)
 
 Aplikasi menggunakan **SQLite** (*zero-configuration*) dengan relasi tabel sebagai berikut:

@@ -126,7 +126,7 @@
                         </label>
 
                         <label class="flex items-center gap-3 p-3.5 rounded-xl border border-earth-200 hover:border-gray-900 cursor-pointer transition-all has-[:checked]:border-gray-900 has-[:checked]:bg-earth-50">
-                            <input type="radio" name="payment_method" value="bank_transfer_bca" x-model="form.payment_method" class="text-gray-900 focus:ring-gray-900">
+                            <input type="radio" name="payment_method" value="va_bca" x-model="form.payment_method" class="text-gray-900 focus:ring-gray-900">
                             <div class="flex-1 flex items-center justify-between">
                                 <div>
                                     <p class="text-xs font-semibold text-gray-900">BCA Virtual Account</p>
@@ -137,7 +137,7 @@
                         </label>
 
                         <label class="flex items-center gap-3 p-3.5 rounded-xl border border-earth-200 hover:border-gray-900 cursor-pointer transition-all has-[:checked]:border-gray-900 has-[:checked]:bg-earth-50">
-                            <input type="radio" name="payment_method" value="bank_transfer_mandiri" x-model="form.payment_method" class="text-gray-900 focus:ring-gray-900">
+                            <input type="radio" name="payment_method" value="va_mandiri" x-model="form.payment_method" class="text-gray-900 focus:ring-gray-900">
                             <div class="flex-1 flex items-center justify-between">
                                 <div>
                                     <p class="text-xs font-semibold text-gray-900">Mandiri Livin' Bill Payment</p>
@@ -161,15 +161,15 @@
 
             </div>
 
-            {{-- Right: Order Summary & Interactive Payment Trigger --}}
-            <div class="lg:col-span-5">
+            {{-- Right: Order Summary, Coupon & Interactive Payment Trigger --}}
+            <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white p-8 rounded-3xl border border-earth-100 shadow-sm sticky top-28 space-y-6">
                     <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-900 pb-4 border-b border-earth-100">
                         Ringkasan Pesanan
                     </h2>
 
                     {{-- Items list --}}
-                    <div class="space-y-4 max-h-72 overflow-y-auto pr-1 divide-y divide-earth-50">
+                    <div class="space-y-4 max-h-60 overflow-y-auto pr-1 divide-y divide-earth-50">
                         @foreach($cartItems as $item)
                         <div class="pt-3 first:pt-0 flex items-center gap-4">
                             <div class="w-14 h-14 rounded-xl bg-earth-50 overflow-hidden flex-shrink-0 border border-earth-100">
@@ -185,7 +185,49 @@
                         @endforeach
                     </div>
 
-                    {{-- Subtotal, Shipping, Total --}}
+                    {{-- COUPON CODE VOUCHER BOX --}}
+                    <div class="pt-4 border-t border-earth-100">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-gray-900 mb-2">
+                            🏷️ Kode Kupon / Voucher Diskon
+                        </label>
+                        
+                        <div x-show="!appliedCoupon" class="flex gap-2">
+                            <input type="text" 
+                                   x-model="couponCode" 
+                                   placeholder="Misal: ANGGARA10 / HEMAT50K"
+                                   @keydown.enter.prevent="applyCoupon()"
+                                   class="flex-1 uppercase font-mono text-xs border border-earth-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-1 focus:ring-forest-700 bg-earth-50/50">
+                            <button type="button" 
+                                    @click="applyCoupon()" 
+                                    :disabled="couponLoading || !couponCode.trim()"
+                                    class="px-5 py-2.5 bg-gray-900 hover:bg-forest-800 disabled:bg-gray-300 text-white rounded-xl text-xs font-semibold uppercase tracking-wider transition-all">
+                                <span x-show="!couponLoading">Terapkan</span>
+                                <span x-show="couponLoading" x-cloak>...</span>
+                            </button>
+                        </div>
+
+                        {{-- Applied Coupon Badge --}}
+                        <div x-show="appliedCoupon" class="bg-forest-50 border border-forest-200 p-3 rounded-xl flex items-center justify-between" x-cloak>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm">🎉</span>
+                                <div>
+                                    <p class="text-xs font-bold text-forest-900 font-mono" x-text="appliedCoupon?.code"></p>
+                                    <p class="text-[11px] text-forest-700" x-text="'Hemat ' + appliedCoupon?.discount_formatted"></p>
+                                </div>
+                            </div>
+                            <button type="button" @click="removeCoupon()" class="text-xs text-red-600 hover:text-red-800 font-semibold underline">
+                                Hapus
+                            </button>
+                        </div>
+
+                        <p x-show="couponMessage" 
+                           :class="couponSuccess ? 'text-forest-700' : 'text-red-600'" 
+                           class="text-[11px] mt-1.5 font-medium" 
+                           x-text="couponMessage" 
+                           x-cloak></p>
+                    </div>
+
+                    {{-- Subtotal, Shipping, Discount, Total --}}
                     <div class="space-y-2.5 pt-4 border-t border-earth-100 text-xs">
                         <div class="flex justify-between text-gray-500">
                             <span>Subtotal Produk</span>
@@ -195,9 +237,13 @@
                             <span>Biaya Pengiriman (Carbon Neutral)</span>
                             <span>{{ 'Rp ' . number_format($shipping, 0, ',', '.') }}</span>
                         </div>
+                        <div x-show="appliedCoupon" class="flex justify-between text-forest-700 font-semibold" x-cloak>
+                            <span>Diskon Kupon (<span x-text="appliedCoupon?.code"></span>)</span>
+                            <span x-text="appliedCoupon?.discount_formatted"></span>
+                        </div>
                         <div class="flex justify-between text-base font-bold text-gray-900 pt-3 border-t border-earth-100">
                             <span>Total Tagihan</span>
-                            <span class="text-forest-800">{{ 'Rp ' . number_format($total, 0, ',', '.') }}</span>
+                            <span class="text-forest-800" x-text="displayTotal"></span>
                         </div>
                     </div>
 
@@ -223,7 +269,17 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center justify-center gap-2 text-[11px] text-gray-400">
+                    {{-- Direct WhatsApp Button Alternative --}}
+                    <div>
+                        <a :href="getCheckoutWhatsAppUrl()"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs tracking-wider uppercase font-semibold transition-all duration-200 shadow-sm flex items-center justify-center gap-2">
+                            <span>💬 Pesan Cepat via WhatsApp</span>
+                        </a>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-2 text-[11px] text-gray-400 pt-2">
                         <span>🛡️</span>
                         <span>Garansi Pengembalian 30 Hari Tanpa Syarat</span>
                     </div>
@@ -301,6 +357,19 @@ function checkoutApp() {
         showMockModal: false,
         currentOrderNumber: '',
         currentOrderTotal: '',
+        
+        // Coupon state
+        couponCode: '',
+        appliedCoupon: null,
+        couponLoading: false,
+        couponMessage: '',
+        couponSuccess: false,
+        defaultTotal: '{{ 'Rp ' . number_format($total, 0, ',', '.') }}',
+        currentTotalFormatted: null,
+
+        get displayTotal() {
+            return this.currentTotalFormatted || this.defaultTotal;
+        },
 
         initCheckout() {
             window.addEventListener('hold-button-completed', (e) => {
@@ -308,6 +377,68 @@ function checkoutApp() {
                     this.submitCheckout();
                 }
             });
+        },
+
+        async applyCoupon() {
+            if (!this.couponCode.trim() || this.couponLoading) return;
+            this.couponLoading = true;
+            this.couponMessage = '';
+
+            try {
+                const res = await fetch('{{ route("checkout.coupon.apply") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ code: this.couponCode })
+                });
+
+                const data = await res.json();
+                this.couponLoading = false;
+
+                if (res.ok && data.success) {
+                    this.appliedCoupon = {
+                        code: data.coupon_code,
+                        discount: data.discount,
+                        discount_formatted: data.discount_formatted,
+                    };
+                    this.currentTotalFormatted = data.new_total_formatted;
+                    this.couponMessage = data.message;
+                    this.couponSuccess = true;
+                } else {
+                    this.couponMessage = data.message || 'Kupon tidak dapat digunakan.';
+                    this.couponSuccess = false;
+                }
+            } catch (e) {
+                this.couponLoading = false;
+                this.couponMessage = 'Terjadi kesalahan saat memproses kupon.';
+                this.couponSuccess = false;
+            }
+        },
+
+        async removeCoupon() {
+            this.couponLoading = true;
+            try {
+                const res = await fetch('{{ route("checkout.coupon.remove") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                this.couponLoading = false;
+                this.appliedCoupon = null;
+                this.couponCode = '';
+                this.currentTotalFormatted = data.new_total_formatted;
+                this.couponMessage = 'Kupon telah dihapus.';
+                this.couponSuccess = true;
+            } catch (e) {
+                this.couponLoading = false;
+            }
         },
 
         async submitCheckout() {
@@ -398,6 +529,17 @@ function checkoutApp() {
                 alert('Terjadi kesalahan koneksi.');
                 this.paying = false;
             }
+        },
+
+        getCheckoutWhatsAppUrl() {
+            const waNumber = '{{ config('services.whatsapp.number', '6281234567890') }}';
+            const name = this.form.customer_name || 'Pembeli';
+            const city = this.form.city || '-';
+            const total = this.displayTotal;
+            const coupon = this.appliedCoupon ? ` (Diskon Kupon ${this.appliedCoupon.code})` : '';
+
+            const msg = `Halo Anggara Footwear, saya mau konfirmasi pesanan:\n• Nama: ${name}\n• Kota: ${city}\n• Total Tagihan: ${total}${coupon}\n\nMohon info nomor rekening / QRIS untuk pembayaran langsung. Terima kasih!`;
+            return `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
         }
     }
 }

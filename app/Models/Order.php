@@ -23,6 +23,9 @@ class Order extends Model
         'payment_type',
         'payment_status',
         'paid_at',
+        'coupon_id',
+        'coupon_code',
+        'discount_amount',
         'status',
         'notes',
     ];
@@ -43,4 +46,10 @@ class Order extends Model
     {
         return 'AB-' . strtoupper(substr(uniqid(), -6)) . '-' . date('Ymd');
     }
+
+    public function coupon(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
 }

@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+
+    'whatsapp' => [
+        'number' => env('WHATSAPP_STORE_NUMBER', '6281234567890'),
+        'store_name' => env('WHATSAPP_STORE_NAME', 'Anggara Footwear'),
+    ],
 ];

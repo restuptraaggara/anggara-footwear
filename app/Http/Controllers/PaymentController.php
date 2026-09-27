@@ -69,7 +69,24 @@ class PaymentController extends Controller
         $order = DB::transaction(function () use ($validated, $cartItems) {
             $subtotal = $cartItems->sum(fn($item) => $item->variant->product->price * $item->quantity);
             $shippingCost = $subtotal >= 500000 ? 0 : 25000;
-            $total = $subtotal + $shippingCost;
+
+            // Coupon discount calculation
+            $couponSession = session()->get('applied_coupon');
+            $discountAmount = 0;
+            $couponId = null;
+            $couponCode = null;
+
+            if ($couponSession) {
+                $coupon = \App\Models\Coupon::find($couponSession['id']);
+                if ($coupon && $coupon->isValidForAmount($subtotal)['valid']) {
+                    $discountAmount = $coupon->calculateDiscount($subtotal);
+                    $couponId = $coupon->id;
+                    $couponCode = $coupon->code;
+                    $coupon->increment('used_count');
+                }
+            }
+
+            $total = max(0, $subtotal - $discountAmount + $shippingCost);
 
             $order = Order::create([
                 'order_number'     => Order::generateOrderNumber(),
@@ -82,11 +99,17 @@ class PaymentController extends Controller
                 'subtotal'         => $subtotal,
                 'shipping_cost'    => $shippingCost,
                 'total'            => $total,
+                'coupon_id'        => $couponId,
+                'coupon_code'      => $couponCode,
+                'discount_amount'  => $discountAmount,
                 'payment_method'   => $validated['payment_method'],
                 'payment_status'   => 'pending',
                 'status'           => 'pending',
                 'notes'            => $validated['notes'] ?? null,
             ]);
+
+            // Clear coupon session
+            session()->forget('applied_coupon');
 
             foreach ($cartItems as $item) {
                 OrderItem::create([

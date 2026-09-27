@@ -79,4 +79,80 @@ class OrderController extends Controller
 
         return back()->with('success', "Status pesanan {$order->order_number} berhasil diubah menjadi: " . strtoupper($newStatus));
     }
+
+    /**
+     * Export all orders to CSV / Excel compatible format
+     */
+    public function exportCsv()
+    {
+        $orders = Order::with(['items.variant.product', 'coupon'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'rekap-pesanan-anggara-footwear-' . date('Y-m-d-His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        $callback = function () use ($orders) {
+            $file = fopen('php://output', 'w');
+            // Add UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // CSV Header Columns
+            fputcsv($file, [
+                'No. Order',
+                'Tanggal Transaksi',
+                'Nama Pembeli',
+                'Email',
+                'No. WhatsApp',
+                'Kota / Kabupaten',
+                'Alamat Pengiriman',
+                'Subtotal (IDR)',
+                'Ongkos Kirim (IDR)',
+                'Kode Kupon',
+                'Diskon (IDR)',
+                'Total Bayar (IDR)',
+                'Metode Pembayaran',
+                'Status Pembayaran',
+                'Status Pesanan',
+                'Rincian Produk (Item - Warna - Size - Qty)',
+            ]);
+
+            foreach ($orders as $order) {
+                $itemsDetail = $order->items->map(function ($item) {
+                    return "{$item->product_name} ({$item->variant_color}, Size {$item->variant_size}) x{$item->quantity}";
+                })->implode('; ');
+
+                fputcsv($file, [
+                    $order->order_number,
+                    $order->created_at->format('Y-m-d H:i:s'),
+                    $order->customer_name,
+                    $order->customer_email,
+                    $order->customer_phone ?? '-',
+                    $order->city,
+                    $order->shipping_address,
+                    $order->subtotal,
+                    $order->shipping_cost,
+                    $order->coupon_code ?? '-',
+                    $order->discount_amount,
+                    $order->total,
+                    strtoupper($order->payment_method),
+                    strtoupper($order->payment_status),
+                    strtoupper($order->status),
+                    $itemsDetail,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }
