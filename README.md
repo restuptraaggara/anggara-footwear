@@ -13,6 +13,20 @@
 
 ## ✨ Fitur Utama
 
+
+### 🔐 Update Stage 2: Admin Panel & Manajemen Stok
+- 🛡️ **Autentikasi Admin Terproteksi**: Rute `/admin` dengan middleware `AdminMiddleware`, akun default `admin@allbirds.test` / `password123`, login page minimalis, dan tombol switch ke public store.
+- 📊 **Dashboard Overview**: Kartu metrik real-time (Total Pendapatan dari order lunas, Total Pesanan, Total Produk Aktif, Peringatan Varian Stok Menipis <5) dan tabel 5 pesanan terbaru.
+- 👟 **Manajemen Katalog & Varian (CRUD)**:
+  - List produk dengan total stok kalkulatif, status featured, dan filter kategori/pencarian.
+  - Form tambah produk baru + varian pembuka.
+  - Manajemen varian sepatu lengkap di dalam detail produk: admin dapat menambah varian baru, mengubah kuantitas stok per ukuran, hex warna, dan URL gambar.
+  - Fitur hapus produk secara aman.
+- 📦 **Manajemen Pesanan Masuk (Order Management)**:
+  - List pesanan masuk dengan badge status dinamis (`pending`, `paid`, `processing`, `shipped`, `completed`, `cancelled`).
+  - Halaman detail pesanan lengkap: data pembeli, alamat pengiriman, rincian varian produk yang dipesan, dan total pembayaran.
+  - **Integrasi Stok Otomatis**: Jika status pesanan diubah ke `cancelled`, stok varian produk yang dipesan otomatis dikembalikan ke gudang penyimpanan.
+
 ### 🚀 Update Stage 1: UX Enhancements & Interactive Features
 - 🔍 **Live Instant Search**: Search bar di navbar dan input pencarian langsung di halaman katalog dengan debounce.
 - 🎛️ **Multi-Facet Filter**: Filter multi-dimensi berdasarkan Kategori, Tipe Material Alami, dan Ukuran Sepatu secara AJAX tanpa reload halaman.
