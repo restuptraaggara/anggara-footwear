@@ -5,14 +5,9 @@
 @section('content')
 
 {{-- HERO SECTION WITH REACT AURORA BACKGROUND --}}
-<section class="relative min-h-[90vh] flex items-center overflow-hidden bg-gray-950 text-white">
+<section class="relative min-h-[90vh] flex items-center overflow-hidden bg-transparent text-white">
     
-    {{-- React Island: Aurora WebGL Background --}}
-    <div id="aurora-background" 
-         data-colors='["#0f291e", "#1b4332", "#1e293b"]'
-         data-speed="0.8"
-         data-amplitude="1.2"
-         class="absolute inset-0 z-0"></div>
+
 
     {{-- Dark vignette gradient overlay for contrast --}}
     <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-black/40 z-10 pointer-events-none"></div>

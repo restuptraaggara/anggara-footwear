@@ -19,10 +19,13 @@
     </style>
     @stack('styles')
 </head>
-<body x-data="appState()"
+<body class="relative min-h-screen bg-[#0d1712] text-gray-100 antialiased selection:bg-emerald-500 selection:text-white" x-data="appState()"
       @cart-updated.window="refreshCart()"
       @add-to-cart.window="addToCart($event.detail.variantId)"
       @wishlist-updated.window="loadWishlist()">
+    {{-- Global Aurora WebGL Background --}}
+    <div id="aurora-background" class="fixed inset-0 pointer-events-none -z-10 overflow-hidden"></div>
+
 
     {{-- Announcement Bar --}}
     <div class="bg-gray-900 text-earth-200 text-center py-2.5 px-4 text-xs tracking-widest font-light">
@@ -30,25 +33,25 @@
     </div>
 
     {{-- Sticky Navbar --}}
-    <nav class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-earth-100" x-data="{ searchOpen: false }">
+    <nav class="sticky top-0 z-40 bg-gray-950/80 backdrop-blur-md border-b border-emerald-950/50 text-white" x-data="{ searchOpen: false }">
         <div class="max-w-7xl mx-auto px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
                 {{-- Logo --}}
-                <a href="{{ route('home') }}" class="text-xl font-semibold tracking-widest uppercase text-gray-900 flex-shrink-0">
+                <a href="{{ route('home') }}" class="text-xl font-semibold tracking-widest uppercase text-white flex-shrink-0">
                     Allbirds
                 </a>
 
                 {{-- Nav Links (hidden when search open) --}}
                 <div class="hidden md:flex items-center gap-8" x-show="!searchOpen" x-transition>
                     <a href="{{ route('products.index', ['category' => 'men']) }}"
-                       class="text-sm font-medium text-gray-600 hover:text-gray-900 tracking-wide transition-colors">Men</a>
+                       class="text-sm font-medium text-gray-300 hover:text-white tracking-wide transition-colors">Men</a>
                     <a href="{{ route('products.index', ['category' => 'women']) }}"
-                       class="text-sm font-medium text-gray-600 hover:text-gray-900 tracking-wide transition-colors">Women</a>
+                       class="text-sm font-medium text-gray-300 hover:text-white tracking-wide transition-colors">Women</a>
                     <a href="{{ route('products.index', ['category' => 'accessories']) }}"
-                       class="text-sm font-medium text-gray-600 hover:text-gray-900 tracking-wide transition-colors">Accessories</a>
+                       class="text-sm font-medium text-gray-300 hover:text-white tracking-wide transition-colors">Accessories</a>
                     <a href="{{ route('products.index') }}"
-                       class="text-sm font-medium text-gray-600 hover:text-gray-900 tracking-wide transition-colors">All Products</a>
+                       class="text-sm font-medium text-gray-300 hover:text-white tracking-wide transition-colors">All Products</a>
                 </div>
 
                 {{-- Search bar (expands inline) --}}
@@ -78,7 +81,7 @@
                                         <p class="text-sm font-medium text-gray-900 truncate" x-text="item.name"></p>
                                         <p class="text-xs text-earth-500 font-light" x-text="item.material_type"></p>
                                     </div>
-                                    <span class="text-sm font-semibold text-gray-900 flex-shrink-0" x-text="item.price_formatted"></span>
+                                    <span class="text-sm font-semibold text-white flex-shrink-0" x-text="item.price_formatted"></span>
                                 </a>
                             </template>
                             <a href="/products" @click.prevent="goSearch()"

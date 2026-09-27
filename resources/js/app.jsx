@@ -10,17 +10,18 @@ import ScrollExpand from './components/ScrollExpand';
 import AccordionGallery from './components/AccordionGallery';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Mount Aurora WebGL Background Island
+  // 1. Mount Global Aurora WebGL Background
   const auroraEl = document.getElementById('aurora-background');
   if (auroraEl) {
     const colorStops = auroraEl.dataset.colors 
       ? JSON.parse(auroraEl.dataset.colors) 
-      : ["#0f291e", "#1b4332", "#1e293b"];
-    const speed = parseFloat(auroraEl.dataset.speed || "0.8");
-    const amplitude = parseFloat(auroraEl.dataset.amplitude || "1.0");
+      : ['#0f291e', '#1b4332', '#1e293b'];
+    const blend = parseFloat(auroraEl.dataset.blend || '0.6');
+    const amplitude = parseFloat(auroraEl.dataset.amplitude || '1.2');
+    const speed = parseFloat(auroraEl.dataset.speed || '0.4');
 
     createRoot(auroraEl).render(
-      <Aurora colorStops={colorStops} speed={speed} amplitude={amplitude} blend={0.6} />
+      <Aurora colorStops={colorStops} blend={blend} amplitude={amplitude} speed={speed} />
     );
   }
 
